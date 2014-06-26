@@ -22,6 +22,13 @@
         <link href="css/navbar-fixed-top.css" rel="stylesheet">
         <!---->
 
+        <!-- 
+        ================================================== -->
+        <!-- Se coloca al final del documento para que cargue mas rapido -->
+        <!-- Se debe de seguir ese orden al momento de llamar los JS -->
+        <script src="js/jquery-1.9.1.js"></script>
+        <script src="js/bootstrap.js"></script>
+        <script src="js/jquery-ui-1.10.3.custom.js"></script>
     </head>
     <body>
         <div class="container">
@@ -116,48 +123,21 @@
                                 <%
                                     try {
                                         con.conectar();
-                                        ResultSet rset = con.consulta("select c.descrip, i.clave from catalogo c, inv i where c.clave = i.clave  order by i.clave+0");
+                                        ResultSet rset = con.consulta("select c.descrip, i.clave from catalogo c, inv i where c.clave = i.clave and c.descrip like '%" + request.getParameter("descrip") + "%' order by i.clave+0");
                                         while (rset.next()) {
                                 %>
                                 <div class="col-lg-3 span12">
-                                    <button class="btn btn-lg btn-warning btn-block " id="<%=rset.getString(2)%>" onclick="alert(this.getAttribute('ID'))" name="medicamento"><h6><%=rset.getString(1)%></h6></button>
+                                    <button class="btn btn-lg btn-warning btn-block " id="<%=rset.getString(2)%>" onclick="añadeInsumo(this)" name="medicamento"><h6><%=rset.getString(1)%></h6></button>
 
                                 </div>
-                                <script>
-
-                                    $('#<%=rset.getString(2)%>').click(function() {
-                                        var idMed = '<%=rset.getString(2)%>';
-                                        var form = $('#formCatalogo');
-                                        var cama = $('#cama').val();
-                                        if (cama === "") {
-                                            alert("Seleccione una Cama");
-                                        } else {
-                                            $.ajax({
-                                                type: 'GET',
-                                                url: 'SurteTemporal?ban=1&medicamento=' + idMed,
-                                                data: form.serialize(),
-                                                success: function(data) {
-                                                    $('#tSurtir').load('mainMenu.jsp #tSurtir');
-                                                }
-                                            });
-                                            return false;
-                                        }
-
-                                    });
-
-                                </script>   
-
-
-
                                 <%
 
                                         }
                                         con.cierraConexion();
                                     } catch (Exception e) {
-
+                                        out.println(e.getMessage());
                                     }
                                 %>
-
                             </div>
                         </div>
                     </form>
@@ -165,106 +145,89 @@
             </div>
         </div>
     </body>
-    <!-- 
-    ================================================== -->
-    <!-- Se coloca al final del documento para que cargue mas rapido -->
-    <!-- Se debe de seguir ese orden al momento de llamar los JS -->
-    <script src="js/jquery-1.9.1.js"></script>
-    <script src="js/bootstrap.js"></script>
-    <script src="js/jquery-ui-1.10.3.custom.js"></script>
     <script>
-                                    function selectCama() {
-                                        var cama = document.getElementById("cama").value;
-                                        document.getElementById("camaSeleccionada").value = cama;
-                                    }
+        function selectCama() {
+            var cama = document.getElementById("cama").value;
+            document.getElementById("camaSeleccionada").value = cama;
+        }
 
-                                    function eliminaInsumo(item) {
-                                        var id = $(item).attr("id");
-                                        var clave = id.split("btn");
-                                        var cla = clave[1];
-                                        var form = $('#formSurtir');
-                                        $.ajax({
-                                            type: 'GET',
-                                            url: 'SurteTemporal?ban=5&cla=' + cla,
-                                            data: form.serialize(),
-                                            success: function() {
-                                                $('#tSurtir').load('mainMenu.jsp #tSurtir');
-                                            }, error: function() {
-                                                alert("Error");
-                                            }
-                                        });
-                                    }
-                                    /*$('#tablaInsumos').load('mainMenu.jsp?descrip= #tablaInsumos');
-                                     function buscaInsumo(item) {
-                                     $('#tablaInsumos').load('mainMenu.jsp?descrip=' + item.value + ' #tablaInsumos');
-                                     }*/
-
-
-                                    $('#formCatalogo').submit(function() {
-                                        //alert("Ingresó");
-                                        return false;
-                                    });
-                                    $('#formSurtir').submit(function() {
-                                        //alert("Ingresó");
-                                        return false;
-                                    });
-
-
-
-        <%
-            try {
-                con.conectar();
-                try {
-                    ResultSet rset = con.consulta("select c.descrip, i.clave from catalogo c, inv i where c.clave = i.clave order by i.clave+0");
-                    while (rset.next()) {
-        %>
-
-
-        <%
-                    }
-                } catch (Exception e) {
-
+        function eliminaInsumo(item) {
+            var id = $(item).attr("id");
+            var clave = id.split("btn");
+            var cla = clave[1];
+            var form = $('#formSurtir');
+            $.ajax({
+                type: 'GET',
+                url: 'SurteTemporal?ban=5&cla=' + cla,
+                data: form.serialize(),
+                success: function() {
+                    $('#tSurtir').load('mainMenu.jsp #tSurtir');
+                }, error: function() {
+                    alert("Error");
                 }
-                con.cierraConexion();
-            } catch (Exception e) {
+            });
+        }
+        $('#tablaInsumos').load('mainMenu.jsp?descrip= #tablaInsumos');
+        function buscaInsumo(item) {
+            $('#tablaInsumos').load('mainMenu.jsp?descrip=' + item.value + ' #tablaInsumos');
+        }
 
+
+        $('#formCatalogo').submit(function() {
+            //alert("Ingresó");
+            return false;
+        });
+        $('#formSurtir').submit(function() {
+            //alert("Ingresó");
+            return false;
+        });
+
+
+
+        $('#btnSurtirCancelar').click(function() {
+            var form = $('#formSurtir');
+            $.ajax({
+                type: 'GET',
+                url: 'SurteTemporal?ban=3',
+                data: form.serialize(),
+                success: function() {
+                    $('#tSurtir').load('mainMenu.jsp #tSurtir');
+                }
+            });
+        });
+
+        $('#btnSurtirSurtir').click(function() {
+            var form = $('#formSurtir');
+            var cama = $('#cama').val();
+            if (cama === "") {
+                alert("Seleccione una Cama");
+                return false;
+            } else {
+                $.ajax({
+                    type: 'GET',
+                    url: 'SurteTemporal?ban=4&cama=' + cama,
+                    data: form.serialize(),
+                    success: function(data) {
+                        $('#tSurtir').load('mainMenu.jsp #tSurtir');
+                    }
+                });
             }
-        %>
+        });
 
 
-                                    $('#btnSurtirCancelar').click(function() {
-                                        var form = $('#formSurtir');
-                                        $.ajax({
-                                            type: 'GET',
-                                            url: 'SurteTemporal?ban=3',
-                                            data: form.serialize(),
-                                            success: function() {
-                                                $('#tSurtir').load('mainMenu.jsp #tSurtir');
-                                            }
-                                        });
-                                    });
-
-                                    $('#btnSurtirSurtir').click(function() {
-                                        var form = $('#formSurtir');
-                                        var cama = $('#cama').val();
-                                        if (cama === "") {
-                                            alert("Seleccione una Cama");
-                                            return false;
-                                        } else {
-                                            $.ajax({
-                                                type: 'GET',
-                                                url: 'SurteTemporal?ban=4&cama=' + cama,
-                                                data: form.serialize(),
-                                                success: function(data) {
-                                                    $('#tSurtir').load('mainMenu.jsp #tSurtir');
-                                                }
-                                            });
-                                        }
-                                    });
-
-
-
+        function añadeInsumo(item) {
+                var idMed = $(item).attr("id");
+                var form = $('#formCatalogo');
+                var cama = $('#cama').val();
+                if (cama === "") {
+                    alert("Seleccione una Cama");
+                } else {
+                    $.ajax({type: 'GET', url: 'SurteTemporal?ban=1&medicamento=' + idMed, data: form.serialize(), success: function(data) {
+                            $('#tSurtir').load('mainMenu.jsp #tSurtir');
+                        }});
+                    return false;
+                }
+        }
     </script>
-
 
 </html>
