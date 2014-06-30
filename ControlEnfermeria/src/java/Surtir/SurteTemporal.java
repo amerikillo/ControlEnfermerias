@@ -50,7 +50,7 @@ public class SurteTemporal extends HttpServlet {
                         String clave = "", idTemp = "", idInv = "";
                         int banExisteIns = 0, cantTemp = 0, cantInv = 0;
                         System.out.println("select clave from inv where id = '" + idMed + "' ");
-                        ResultSet rset = con.consulta("select id, cant from surtetemporal where clave = '" + idMed + "' ");
+                        ResultSet rset = con.consulta("select id, cant from surtetemporal where clave = '" + idMed + "' and servicios = '"+sesion.getAttribute("servicio")+"'   ");
                         while (rset.next()) {
                             banExisteIns = 1;
                             idTemp = rset.getString(1);
@@ -101,16 +101,24 @@ public class SurteTemporal extends HttpServlet {
                     int folio = dameFolioCaptura();
 
                     con.conectar();
-                    ResultSet rset = con.consulta("select clave, cant from surtetemporal where id_usu = '" + sesion.getAttribute("id") + "' ");
+                    System.out.println("select clave, cant from surtetemporal where id_usu = '" + sesion.getAttribute("id") + "' and servicios = '"+(String)sesion.getAttribute("servicio")+"'  ");
+                    ResultSet rset = con.consulta("select clave, cant, servicios from surtetemporal where id_usu = '" + sesion.getAttribute("id") + "' and servicios = '"+(String)sesion.getAttribute("servicio")+"'  ");
                     while (rset.next()) {
                         String id = "";
-                        ResultSet rset2 = con.consulta("select id from inv where clave = '" + rset.getString(1) + "' ");
+                        String idServ="";
+                        ResultSet rset2 = con.consulta("select id from servicios where servicio = '" + rset.getString(3) + "' ");
+                        while (rset2.next()) {
+                            idServ=rset2.getString(1);
+                        }
+                        
+                        System.out.println(idServ);
+                        rset2 = con.consulta("select id from inv where clave = '" + rset.getString(1) + "' and id_serv = '"+idServ+"'  ");
                         while (rset2.next()) {
                             id = rset2.getString(1);
                         }
                         con.ejecuta("insert into captura values (0, '" + folio + "', CURDATE(), CURTIME(), '" + id + "', '" + rset.getString(2) + "', '" + request.getParameter("cama") + "', '" + sesion.getAttribute("id") + "'  )");
                     }
-                    con.ejecuta("delete from surtetemporal");
+                    con.ejecuta("delete from surtetemporal where servicios = '"+(String)sesion.getAttribute("servicio")+"' ");
                     con.cierraConexion();
                 } else if (request.getParameter("ban").equals("5")) {
                     con.conectar();

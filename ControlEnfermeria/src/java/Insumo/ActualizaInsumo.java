@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Login;
+package Insumo;
 
 import Clases.ConectionDB;
 import java.io.IOException;
@@ -13,13 +13,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author Amerikillo
  */
-public class Login extends HttpServlet {
+public class ActualizaInsumo extends HttpServlet {
 
     ConectionDB con = new ConectionDB();
 
@@ -36,55 +35,38 @@ public class Login extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        HttpSession sesion = request.getSession(true);
         try {
-            if (request.getParameter("accion").equals("1")) {
-                int ban = 0;
-                con.conectar();
-                try {
-                    ResultSet rset = con.consulta("select u.id, s.servicio, u.id_serv from usuarios u, servicios s where u.id_serv = s.id and usuario = '" + request.getParameter("user") + "' and pass = PASSWORD('" + request.getParameter("pass") + "') ");
-                    while (rset.next()) {
-                        ban = 1;
-                        sesion.setAttribute("id", rset.getString("id"));
-                        sesion.setAttribute("servicio", rset.getString("servicio"));
-                        sesion.setAttribute("id_serv", rset.getString("id_serv"));
+            con.conectar();
+            try {
+                int minInv = 0, maxInv = 0;
+                ResultSet rset = con.consulta("select min(id), max(id) from inv");
+                while (rset.next()) {
+                    minInv = Integer.parseInt(rset.getString(1));
+                    maxInv = Integer.parseInt(rset.getString(2));
+                }
+                System.out.println(minInv + "---" + maxInv);
+                int i = minInv;
+                System.out.println(i + "---");
+                while (i <= maxInv) {
+                    System.out.println(i);
+                    try {
+                        String valor = request.getParameter(i + "");
+                        if (valor != null) {
+                            con.ejecuta("update inv set piezas = '" + request.getParameter(i + "") + "' where id = '" + i + "' ");
+                        }
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    i++;
                 }
-                con.cierraConexion();
-
-                if (ban == 1) {
-                    response.sendRedirect("mainMenu.jsp");
-                } else {
-                    sesion.invalidate();
-                    response.sendRedirect("index.jsp");
-                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
-            if (request.getParameter("accion").equals("2")) {
-                int ban = 0;
-                con.conectar();
-                try {
-                    ResultSet rset = con.consulta("select id from administradores where user = '" + request.getParameter("user") + "' and pass = PASSWORD('" + request.getParameter("pass") + "') ");
-                    while (rset.next()) {
-                        ban = 1;
-                        sesion.setAttribute("id", rset.getString("id"));
-                    }
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-                con.cierraConexion();
-
-                if (ban == 1) {
-                    response.sendRedirect("mainAdmin.jsp");
-                } else {
-                    sesion.invalidate();
-                    response.sendRedirect("indexAdmin.jsp");
-                }
-            }
+            con.cierraConexion();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        response.sendRedirect("editaMedicamento.jsp");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

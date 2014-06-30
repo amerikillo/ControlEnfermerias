@@ -17,7 +17,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Administrador</title>
         <!-- Estilos CSS -->
         <link href="css/bootstrap.css" rel="stylesheet">
         <link rel="stylesheet" href="css/cupertino/jquery-ui-1.10.3.custom.css" />
@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="panel panel-body">
-                    <h3>Módulo Central de Enfermería</h3>
+                    <h3>Módulo Central de Enfermería - Administrador</h3>
                     <h4 class="form-signin-heading">Ingrese sus Credenciales</h4>
                     <div class="input-group">
                         <span class="input-group-addon">
@@ -59,7 +59,7 @@
                     <%
                         }
                     %>
-                    <button class="btn btn-lg btn-success btn-block" type="submit" name="accion" value="1">Entrar</button>
+                    <button class="btn btn-lg btn-success btn-block" type="submit" name="accion" value="2">Entrar</button>
                 </div>
                 <div class="row">
                     <div class="col-lg-12 text-center">

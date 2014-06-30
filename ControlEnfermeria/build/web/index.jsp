@@ -77,3 +77,6 @@
     <script src="js/bootstrap.js"></script>
     <script src="js/jquery-ui-1.10.3.custom.js"></script>
 </html>
+<%
+sesion.invalidate();
+%>

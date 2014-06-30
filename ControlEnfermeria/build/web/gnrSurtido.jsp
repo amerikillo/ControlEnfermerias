@@ -13,45 +13,69 @@
     HttpSession sesion = request.getSession();
     ConectionDB con = new ConectionDB();
 
+    response.setContentType("application/vnd.ms-excel");
+    response.setHeader("Content-Disposition", "attachment;filename=\"Surtido-" + request.getParameter("central") + "-" + new Date() + ".xls\"");
+
 %>
 <!DOCTYPE html>
 <table border="1">
     <tr>
-        <td>Servicio</td>
         <td>Clave</td>
         <td>Descripción</td>
-        <td>Tab/Amp</td>
+        <td>Piezas</td>
+        <td>Cajas</td>
+        <td>Stock Min</td>
+        <td>Stock Max</td>
         <td>Reponer</td>
     </tr>
-    <%        try {
+    <%                    try {
             con.conectar();
-            ResultSet rset = con.consulta("select c.clave, c.descrip, sum(cap.cant_sur) from catalogo c, inv i, captura cap, usuarios u where c.clave = i.clave and i.id = cap.id_inv and cap.fecha = '" + request.getParameter("fecha") + "' and u.servicio='" + request.getParameter("central") + "' group by c.clave order by c.clave+0 ");
+            ResultSet rset = con.consulta("select c.clave, c.descrip from catalogo c, stock st, servicios s where c.clave = st.clave and st.id_serv = s.id and s.servicio ='" + (String) sesion.getAttribute("servicio") + "' and st.maximo!=0 ");
             while (rset.next()) {
+                String max = "", min = "", inv = "0";
                 int cant_disp = 0;
                 ResultSet rset2 = con.consulta("select cant_disp from clave_med where clave= '" + rset.getString(1) + "' ");
                 while (rset2.next()) {
                     cant_disp = rset2.getInt(1);
                 }
-                int total_cajas = (int) Math.ceil(rset.getInt(3) / cant_disp);
+
+                rset2 = con.consulta("select piezas from inv i, servicios s where i.id_serv = s.id and clave = '" + rset.getString(1) + "' and s.servicio = '" + (String) sesion.getAttribute("servicio") + "'   ");
+                while (rset2.next()) {
+                    inv = rset2.getString(1);
+                }
+                int cajasExist = 0;
+                try {
+                    cajasExist = (int) Math.ceil(Integer.parseInt(inv) / cant_disp);
+                } catch (Exception e) {
+
+                }
+
+                rset2 = con.consulta("select st.maximo, st.minimo from stock st, servicios s where st.id_serv = s.id and clave = '" + rset.getString(1) + "' and s.servicio = '" + (String) sesion.getAttribute("servicio") + "'   ");
+                while (rset2.next()) {
+                    max = rset2.getString(1);
+                    min = rset2.getString(2);
+                }
+
+                int reponer = Integer.parseInt(max) - cajasExist;
+                if (reponer < 0) {
+                    reponer = 0;
+                }
     %>
     <tr>
-        <td><%=request.getParameter("central")%></td>
         <td><%=rset.getString(1)%></td>
         <td><%=rset.getString(2)%></td>
-        <td><%=rset.getString(3)%></td>
-        <td><%=total_cajas%></td>
+        <td><%=inv%></td>
+        <td><%=cajasExist%></td>
+        <td><%=min%></td>
+        <td><%=max%></td>
+        <td><strong><%=reponer%></strong></td>
     </tr>
     <%
             }
             con.cierraConexion();
         } catch (Exception e) {
-            out.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
     %>
 </table>
 
-<%
-    response.setContentType("application/vnd.ms-excel");
-    response.setHeader("Content-Disposition", "attachment;filename=\"Surtido-"+request.getParameter("central")+"-"+request.getParameter("fecha")+".xls\"");
-
-%>

@@ -10,6 +10,16 @@
 <%
     HttpSession sesion = request.getSession();
     ConectionDB con = new ConectionDB();
+
+    String servi = "";
+    try {
+        servi = (String) sesion.getAttribute("servicio");
+    } catch (Exception e) {
+    }
+    
+    if (servi==null){
+        response.sendRedirect("index.jsp");
+    }
 %>
 <!DOCTYPE html>
 <html>
@@ -32,9 +42,24 @@
     </head>
     <body>
         <div class="container">
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2>Surtido de Insumo</h2>
+                    <a href="mainMenu.jsp" class="btn btn-info">Surtir</a>
+                    <a href="cargaAbasto.jsp" class="btn btn-default">Cargar Abasto</a>
+                    <a href="verExistencias.jsp" class="btn btn-default">Existencias</a>
+                    <a href="verSurtido.jsp" class="btn btn-default">Surtido</a>
+                    <a href="index.jsp" class="btn btn-default">Salir</a>
+                </div>
+                <div class="col-lg-6 text-right">
+                    <img src="imagenes/logo_salud_gob.jpg" height="100px" />
+                </div>
+            </div>
+            <br/>
             <div class="row">
                 <div class="col-lg-12">
-                    <h2>Control de Medicamento a Camas</h2>
+                    <h4><%=(String) sesion.getAttribute("servicio")%></h4>
                 </div>
             </div>
             <div class="row">
@@ -49,7 +74,7 @@
                                 <%
                                     try {
                                         con.conectar();
-                                        ResultSet rset = con.consulta("select cama, id from camas order by id+0");
+                                        ResultSet rset = con.consulta("select c.cama, c.id from camas c, servicios s where s.id=c.id_serv and s.servicio = '" + (String) sesion.getAttribute("servicio") + "'  order by c.id+0");
                                         while (rset.next()) {
                                 %>
                                 <option value = '<%=rset.getString("id")%>' ><%=rset.getString("cama")%></option>
@@ -57,7 +82,7 @@
                                         }
                                         con.cierraConexion();
                                     } catch (Exception e) {
-
+                                        System.out.println(e.getMessage());
                                     }
                                 %>
                             </select>
@@ -123,7 +148,7 @@
                                 <%
                                     try {
                                         con.conectar();
-                                        ResultSet rset = con.consulta("select c.descrip, i.clave from catalogo c, inv i where c.clave = i.clave and c.descrip like '%" + request.getParameter("descrip") + "%' order by i.clave+0");
+                                        ResultSet rset = con.consulta("select c.descrip, i.clave from catalogo c, inv i, servicios serv where c.clave = i.clave and c.descrip like '%" + request.getParameter("descrip") + "%' and i.id_serv = serv.id and serv.servicio = '" + (String) sesion.getAttribute("servicio") + "' group by i.clave  order by i.clave+0");
                                         while (rset.next()) {
                                 %>
                                 <div class="col-lg-3 span12">
@@ -209,6 +234,7 @@
                     data: form.serialize(),
                     success: function(data) {
                         $('#tSurtir').load('mainMenu.jsp #tSurtir');
+                        alert("Orden Surtida");
                     }
                 });
             }
@@ -216,17 +242,17 @@
 
 
         function añadeInsumo(item) {
-                var idMed = $(item).attr("id");
-                var form = $('#formCatalogo');
-                var cama = $('#cama').val();
-                if (cama === "") {
-                    alert("Seleccione una Cama");
-                } else {
-                    $.ajax({type: 'GET', url: 'SurteTemporal?ban=1&medicamento=' + idMed, data: form.serialize(), success: function(data) {
-                            $('#tSurtir').load('mainMenu.jsp #tSurtir');
-                        }});
-                    return false;
-                }
+            var idMed = $(item).attr("id");
+            var form = $('#formCatalogo');
+            var cama = $('#cama').val();
+            if (cama === "") {
+                alert("Seleccione una Cama");
+            } else {
+                $.ajax({type: 'GET', url: 'SurteTemporal?ban=1&medicamento=' + idMed, data: form.serialize(), success: function(data) {
+                        $('#tSurtir').load('mainMenu.jsp #tSurtir');
+                    }});
+                return false;
+            }
         }
     </script>
 
