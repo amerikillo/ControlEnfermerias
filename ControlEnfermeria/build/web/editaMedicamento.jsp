@@ -106,15 +106,13 @@
                                 }
                             %>
                         </select>
+                    </form>
                 </div>
             </div>
-            <br/>
-            <form action="ActualizaInsumo">
+            <form action="ActualizaInsumo" name="ActualizarInsumo" method="post" id="ActualizarInsumo">
                 <div class="col-lg-3 col-sm-offset-9">
                     <button class="btn btn-primary btn-block">Actualizar</button>
                 </div>
-                <br/>
-                <br/>
                 <table class="table table-bordered table-striped table-condensed" id="tbSurtir">
                     <thead>
                         <tr>
@@ -141,30 +139,22 @@
                                         inv = rset2.getString(1);
                                         idInv = rset2.getString(2);
                                     }
-                                    int cajasExist = 0;
-                                    try {
-                                        cajasExist = (int) Math.ceil(Integer.parseInt(inv) / cant_disp);
-                                    } catch (Exception e) {
-
+                                    
+                                    if (idInv.equals("")) {
+                                        con.ejecuta("insert ");
                                     }
 
-                                    rset2 = con.consulta("select st.maximo, st.minimo from stock st, servicios s where st.id_serv = s.id and clave = '" + rset.getString(1) + "' and s.servicio = '" + request.getParameter("central") + "'   ");
-                                    while (rset2.next()) {
-                                        max = rset2.getString(1);
-                                        min = rset2.getString(2);
-                                    }
-
-                                    int reponer = Integer.parseInt(max) - cajasExist;
-                                    if (reponer < 0) {
-                                        reponer = 0;
-                                    }
+                                    if (!idInv.equals("")) {
                         %>
+
                         <tr>
                             <td><%=rset.getString(1)%></td>
                             <td><%=rset.getString(2)%></td>
                             <td><input type="text" value="<%=inv%>" name="<%=idInv%>" id="<%=idInv%>" /></td>
                         </tr>
                         <%
+                                    }
+                                    System.out.println("<td><input type='text' value='" + inv + "' 'name=" + idInv + "' id='" + idInv + "'/></td>" + "" + inv + "---" + idInv + "----" + idInv);
                                 }
                                 con.cierraConexion();
                             } catch (Exception e) {

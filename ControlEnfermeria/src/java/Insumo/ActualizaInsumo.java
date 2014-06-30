@@ -46,12 +46,12 @@ public class ActualizaInsumo extends HttpServlet {
                 }
                 System.out.println(minInv + "---" + maxInv);
                 int i = minInv;
-                System.out.println(i + "---");
                 while (i <= maxInv) {
                     System.out.println(i);
                     try {
-                        String valor = request.getParameter(i + "");
+                        String valor = request.getParameter(String.valueOf(i));
                         if (valor != null) {
+                            System.out.println("update inv set piezas = '" + request.getParameter(i + "") + "' where id = '" + i + "' ");
                             con.ejecuta("update inv set piezas = '" + request.getParameter(i + "") + "' where id = '" + i + "' ");
                         }
                     } catch (Exception e) {
