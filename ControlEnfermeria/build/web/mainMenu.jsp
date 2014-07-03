@@ -50,6 +50,7 @@
                     <a href="cargaAbasto.jsp" class="btn btn-default">Cargar Abasto</a>
                     <a href="verExistencias.jsp" class="btn btn-default">Existencias</a>
                     <a href="verSurtido.jsp" class="btn btn-default">Surtido</a>
+                    <a href="verCatalogo.jsp" class="btn btn-default">Catálogo</a>
                     <a href="index.jsp" class="btn btn-default">Salir</a>
                 </div>
                 <div class="col-lg-6 text-right">

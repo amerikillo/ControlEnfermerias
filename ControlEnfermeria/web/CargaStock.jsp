@@ -4,7 +4,7 @@
     ConectionDB con = new ConectionDB();
     try {
         con.conectar();
-        con.ejecuta("delete from stock;");
+        //con.ejecuta("delete from stock;");
         try {
             ResultSet rset = con.consulta("select field1, field2, field6,field7 from stockTodo");
             while (rset.next()) {

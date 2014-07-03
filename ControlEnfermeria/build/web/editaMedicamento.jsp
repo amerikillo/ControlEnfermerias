@@ -141,7 +141,7 @@
                                     }
                                     
                                     if (idInv.equals("")) {
-                                        con.ejecuta("insert ");
+                                        
                                     }
 
                                     if (!idInv.equals("")) {

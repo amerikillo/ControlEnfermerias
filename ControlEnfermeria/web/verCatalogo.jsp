@@ -61,12 +61,12 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-6">
-                    <h2>Surtido Diario</h2>
+                    <h2>Catálogo de Medicamentos</h2>
                     <a href="mainMenu.jsp" class="btn btn-default">Surtir</a>
                     <a href="cargaAbasto.jsp" class="btn btn-default">Cargar Abasto</a>
                     <a href="verExistencias.jsp" class="btn btn-default">Existencias</a>
-                    <a href="verSurtido.jsp" class="btn btn-info">Surtido</a>
-                    <a href="verCatalogo.jsp" class="btn btn-default">Catálogo</a>
+                    <a href="verSurtido.jsp" class="btn btn-default">Surtido</a>
+                    <a href="verCatalogo.jsp" class="btn btn-info">Catálogo</a>
                     <a href="index.jsp" class="btn btn-default">Salir</a>
                 </div>
                 <div class="col-lg-6 text-right">
@@ -79,39 +79,24 @@
                     <h4><%=(String) sesion.getAttribute("servicio")%></h4>
                 </div>
             </div>
-            <div class="row">
-                <form action="verSurtido.jsp" method="post">
-                    <div class="col-lg-2">
-                        <input type="text" id="fecha" name="fecha" class="form-control" onchange="this.form.submit();" value="<%=fecha%>"  data-date-format="dd/mm/yyyy"/>
-                    </div>
-
-                </form>
-                <div class="col-lg-1 col-sm-offset-9">
-                    <a href="gnrConsumoDiario.jsp?central=<%=(String) sesion.getAttribute("servicio")%>&fecha=<%=fecha%>"><img src="imagenes/excel.png" width="100%" alt="Exportar"/></a>
-                </div>
-            </div>
             <table class="table table-bordered table-striped table-condensed" id="tbSurtir">
                 <thead>
                     <tr>
                         <td>Clave</td>
                         <td>Descripción</td>
-                        <td>Piezas</td>
-                        <td>Camas</td>
                     </tr>
                 </thead>
                 <tbody>
                     <%
                         try {
                             con.conectar();
-                            ResultSet rset = con.consulta("SELECT	cat.clave,	cat.descrip,	c.cant_sur, cam.cama FROM	captura c,	catalogo cat,	inv i,	servicios s, camas cam WHERE cam.id = c.id_cama and c.id_inv = i.id AND cat.clave = i.clave AND i.id_serv = s.id AND c.fecha = '" + fechaQry + "' AND s.servicio = '" + (String) sesion.getAttribute("servicio") + "'");
+                            ResultSet rset = con.consulta("select clave, descrip from catalogo_claves order by clave+0");
                             while (rset.next()) {
-
+                                
                     %>
                     <tr>
                         <td><%=rset.getString(1)%></td>
                         <td><%=rset.getString(2)%></td>
-                        <td><strong><%=rset.getString(3)%></strong></td>
-                        <td><strong><%=rset.getString(4)%></strong></td>
                     </tr>
                     <%
                             }
