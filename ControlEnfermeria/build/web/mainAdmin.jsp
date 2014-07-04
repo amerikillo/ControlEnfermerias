@@ -142,7 +142,7 @@
                                 }
                                 int cajasExist = 0;
                                 try {
-                                    cajasExist = (int) Math.ceil(Integer.parseInt(inv) / cant_disp);
+                                    cajasExist = (int)( Math.ceil(Double.parseDouble(inv) / cant_disp));
                                 } catch (Exception e) {
 
                                 }
@@ -153,7 +153,7 @@
                                     min = rset2.getString(2);
                                 }
 
-                                int reponer = Integer.parseInt(max) - cajasExist;
+                                int reponer = (Integer.parseInt(max) - cajasExist);
                                 if (reponer < 0) {
                                     reponer = 0;
                                 }

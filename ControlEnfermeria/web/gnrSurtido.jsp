@@ -30,7 +30,7 @@
     </tr>
     <%                    try {
             con.conectar();
-            ResultSet rset = con.consulta("select c.clave, c.descrip from catalogo c, stock st, servicios s where c.clave = st.clave and st.id_serv = s.id and s.servicio ='" + (String) sesion.getAttribute("servicio") + "' and st.maximo!=0 ");
+            ResultSet rset = con.consulta("select c.clave, c.descrip from catalogo c, stock st, servicios s where c.clave = st.clave and st.id_serv = s.id and s.servicio ='" + request.getParameter("central") + "' and st.maximo!=0 ");
             while (rset.next()) {
                 String max = "", min = "", inv = "0";
                 int cant_disp = 0;
@@ -39,18 +39,18 @@
                     cant_disp = rset2.getInt(1);
                 }
 
-                rset2 = con.consulta("select piezas from inv i, servicios s where i.id_serv = s.id and clave = '" + rset.getString(1) + "' and s.servicio = '" + (String) sesion.getAttribute("servicio") + "'   ");
+                rset2 = con.consulta("select piezas from inv i, servicios s where i.id_serv = s.id and clave = '" + rset.getString(1) + "' and s.servicio = '" + request.getParameter("central") + "'   ");
                 while (rset2.next()) {
                     inv = rset2.getString(1);
                 }
                 int cajasExist = 0;
                 try {
-                    cajasExist = (int) Math.ceil(Integer.parseInt(inv) / cant_disp);
+                    cajasExist = (int) Math.floor(Integer.parseInt(inv) / cant_disp);
                 } catch (Exception e) {
 
                 }
 
-                rset2 = con.consulta("select st.maximo, st.minimo from stock st, servicios s where st.id_serv = s.id and clave = '" + rset.getString(1) + "' and s.servicio = '" + (String) sesion.getAttribute("servicio") + "'   ");
+                rset2 = con.consulta("select st.maximo, st.minimo from stock st, servicios s where st.id_serv = s.id and clave = '" + rset.getString(1) + "' and s.servicio = '" + request.getParameter("central") + "'   ");
                 while (rset2.next()) {
                     max = rset2.getString(1);
                     min = rset2.getString(2);

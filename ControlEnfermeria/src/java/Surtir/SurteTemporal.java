@@ -130,7 +130,7 @@ public class SurteTemporal extends HttpServlet {
                         clave = rset.getString(2);
                     }
 
-                    rset = con.consulta("select id, piezas from inv where clave = '" + clave + "' ");
+                    rset = con.consulta("select id, piezas from inv where clave = '" + clave + "' and id_serv = '"+(String)sesion.getAttribute("id_serv")+"' ");
                     while (rset.next()) {
                         idInv = rset.getString(1);
                         cantInv = rset.getInt(2);
