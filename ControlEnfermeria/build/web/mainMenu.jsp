@@ -151,6 +151,7 @@
                                         con.conectar();
                                         ResultSet rset = con.consulta("select c.descrip, i.clave from catalogo c, inv i, servicios serv where c.clave = i.clave and c.descrip like '%" + request.getParameter("descrip") + "%' and i.id_serv = serv.id and serv.servicio = '" + (String) sesion.getAttribute("servicio") + "' group by i.clave  order by i.clave+0");
                                         while (rset.next()) {
+                                            System.out.println(rset.getString(2)+"---"+rset.getString(1));
                                 %>
                                 <div class="col-lg-3 span12">
                                     <button class="btn btn-lg btn-warning btn-block " id="<%=rset.getString(2)%>" onclick="añadeInsumo(this)" name="medicamento"><h6><%=rset.getString(1)%></h6></button>

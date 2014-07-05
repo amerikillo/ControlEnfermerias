@@ -49,18 +49,18 @@ public class SurteTemporal extends HttpServlet {
                     try {
                         String clave = "", idTemp = "", idInv = "";
                         int banExisteIns = 0, cantTemp = 0, cantInv = 0;
-                        System.out.println("select clave from inv where id = '" + idMed + "' ");
-                        ResultSet rset = con.consulta("select id, cant from surtetemporal where clave = '" + idMed + "' and servicios = '"+sesion.getAttribute("servicio")+"'   ");
+                        ResultSet rset = con.consulta("select id, cant from surtetemporal where clave = '" + idMed + "' and servicios = '" + sesion.getAttribute("servicio") + "'   ");
                         while (rset.next()) {
                             banExisteIns = 1;
                             idTemp = rset.getString(1);
                             cantTemp = rset.getInt(2);
                         }
-                        rset = con.consulta("select id, piezas from inv where clave = '" + idMed + "' ");
+                        rset = con.consulta("select id, piezas from inv where clave = '" + idMed + "' and id_serv='" + sesion.getAttribute("id_serv") + "' ");
                         while (rset.next()) {
                             idInv = rset.getString(1);
                             cantInv = rset.getInt(2);
                         }
+                        System.out.println(cantInv);
                         if (cantInv <= 0) {
 
                         } else {
@@ -68,6 +68,7 @@ public class SurteTemporal extends HttpServlet {
                                 con.ejecuta("update  surtetemporal set cant = '" + (cantTemp + 1) + "' where id = '" + idTemp + "' ");
                                 con.ejecuta("update  inv set piezas = '" + (cantInv - 1) + "' where id = '" + idInv + "' ");
                             } else {
+                                System.out.println("insert into surtetemporal values (0,'" + idMed + "','1','" + sesion.getAttribute("id") + "','" + sesion.getAttribute("servicio") + "')");
                                 con.ejecuta("insert into surtetemporal values (0,'" + idMed + "','1','" + sesion.getAttribute("id") + "','" + sesion.getAttribute("servicio") + "')");
                                 con.ejecuta("update  inv set piezas = '" + (cantInv - 1) + "' where id = '" + idInv + "' ");
                             }
@@ -92,7 +93,7 @@ public class SurteTemporal extends HttpServlet {
                         int cantInv = rset.getInt("cant");
                         ResultSet rset2 = con.consulta("select piezas from inv where clave = '" + clave + "' ");
                         while (rset2.next()) {
-                            con.ejecuta("update inv set piezas = '"+(rset2.getInt(1)+cantInv)+"' where clave = '"+clave+"'  ");
+                            con.ejecuta("update inv set piezas = '" + (rset2.getInt(1) + cantInv) + "' where clave = '" + clave + "'  ");
                         }
                     }
                     con.ejecuta("delete from surtetemporal");
@@ -101,24 +102,24 @@ public class SurteTemporal extends HttpServlet {
                     int folio = dameFolioCaptura();
 
                     con.conectar();
-                    System.out.println("select clave, cant from surtetemporal where id_usu = '" + sesion.getAttribute("id") + "' and servicios = '"+(String)sesion.getAttribute("servicio")+"'  ");
-                    ResultSet rset = con.consulta("select clave, cant, servicios from surtetemporal where id_usu = '" + sesion.getAttribute("id") + "' and servicios = '"+(String)sesion.getAttribute("servicio")+"'  ");
+                    System.out.println("select clave, cant from surtetemporal where id_usu = '" + sesion.getAttribute("id") + "' and servicios = '" + (String) sesion.getAttribute("servicio") + "'  ");
+                    ResultSet rset = con.consulta("select clave, cant, servicios from surtetemporal where id_usu = '" + sesion.getAttribute("id") + "' and servicios = '" + (String) sesion.getAttribute("servicio") + "'  ");
                     while (rset.next()) {
                         String id = "";
-                        String idServ="";
+                        String idServ = "";
                         ResultSet rset2 = con.consulta("select id from servicios where servicio = '" + rset.getString(3) + "' ");
                         while (rset2.next()) {
-                            idServ=rset2.getString(1);
+                            idServ = rset2.getString(1);
                         }
-                        
+
                         System.out.println(idServ);
-                        rset2 = con.consulta("select id from inv where clave = '" + rset.getString(1) + "' and id_serv = '"+idServ+"'  ");
+                        rset2 = con.consulta("select id from inv where clave = '" + rset.getString(1) + "' and id_serv = '" + idServ + "'  ");
                         while (rset2.next()) {
                             id = rset2.getString(1);
                         }
                         con.ejecuta("insert into captura values (0, '" + folio + "', CURDATE(), CURTIME(), '" + id + "', '" + rset.getString(2) + "', '" + request.getParameter("cama") + "', '" + sesion.getAttribute("id") + "'  )");
                     }
-                    con.ejecuta("delete from surtetemporal where servicios = '"+(String)sesion.getAttribute("servicio")+"' ");
+                    con.ejecuta("delete from surtetemporal where servicios = '" + (String) sesion.getAttribute("servicio") + "' ");
                     con.cierraConexion();
                 } else if (request.getParameter("ban").equals("5")) {
                     con.conectar();
@@ -130,7 +131,7 @@ public class SurteTemporal extends HttpServlet {
                         clave = rset.getString(2);
                     }
 
-                    rset = con.consulta("select id, piezas from inv where clave = '" + clave + "' and id_serv = '"+(String)sesion.getAttribute("id_serv")+"' ");
+                    rset = con.consulta("select id, piezas from inv where clave = '" + clave + "' and id_serv = '" + (String) sesion.getAttribute("id_serv") + "' ");
                     while (rset.next()) {
                         idInv = rset.getString(1);
                         cantInv = rset.getInt(2);
